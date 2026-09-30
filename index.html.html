@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>JobFlow — Smart Job Application Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#14162b;--mut:#6b7090;--line:#e3e6f0;--acc:#5b5bf0;--acc2:#22c3a6;--warn:#f59e0b;--bad:#ef4444;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0f1d;--card:#171a30;--ink:#eef0ff;--mut:#9aa0c4;--line:#272b4a}}
+:root[data-theme="dark"]{--bg:#0d0f1d;--card:#171a30;--ink:#eef0ff;--mut:#9aa0c4;--line:#272b4a}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1150px;margin:auto;padding:0 20px}
+.btn{border:0;border-radius:12px;padding:12px 22px;font-weight:600;cursor:pointer;transition:.2s}
+.pri{background:linear-gradient(135deg,var(--acc),#8b5cf6);color:#fff;box-shadow:0 8px 24px #5b5bf055}.pri:hover{transform:translateY(-2px)}
+.sec{background:var(--card);border:1px solid var(--line)}.sec:hover{transform:translateY(-2px)}
+nav{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+.logo{font-weight:800;font-size:22px}.logo b{color:var(--acc)}
+.hero{text-align:center;padding:50px 0 70px}
+.hero h1{font-size:clamp(38px,7vw,72px);margin:10px 0;letter-spacing:-2px;line-height:1.05}
+.grad{background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:620px;margin:16px auto 28px;color:var(--mut);font-size:18px}
+.fade{opacity:0;transform:translateY(18px);animation:up .7s forwards}@keyframes up{to{opacity:1;transform:none}}
+.flow{display:flex;justify-content:center;align-items:center;gap:0;margin-top:54px;flex-wrap:wrap}
+.node{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 20px;font-weight:700;animation:glow 8s infinite;animation-delay:calc(var(--i)*2s)}
+.node small{display:block;color:var(--mut);font-weight:500;font-size:12px}
+.link{width:50px;height:3px;background:var(--line);position:relative;overflow:hidden;border-radius:3px}
+.link:after{content:"";position:absolute;inset:0;width:16px;background:var(--acc);animation:run 2s infinite linear;animation-delay:calc(var(--i)*2s)}
+@keyframes run{from{left:-16px}to{left:50px}}
+@keyframes glow{0%,22%{border-color:var(--acc);box-shadow:0 0 0 6px #5b5bf01f;transform:translateY(-4px)}28%,100%{border-color:var(--line);box-shadow:none;transform:none}}
+section.blk{padding:60px 0}h2{font-size:clamp(28px,4vw,42px);letter-spacing:-1px;margin:0 0 8px;text-align:center}
+.sub{text-align:center;color:var(--mut);margin-bottom:30px}
+.stage{position:relative;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:30px;min-height:330px;overflow:hidden}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:20px;transition:all .8s cubic-bezier(.3,1.4,.5,1);transform:rotate(var(--r)) translate(var(--x),var(--y))}
+.chip .e{font-size:30px}.chip .t{font-weight:600}.chip .s{display:none;color:var(--acc2);font-size:14px;margin-top:6px}
+.solved .chip{transform:none;border-color:var(--acc2)}.solved .chip .s{display:block}.solved .chip .p{display:none}
+.mini{display:flex;gap:8px;margin-top:22px;opacity:0;max-height:0;transition:all .8s .3s;overflow:hidden}
+.solved .mini{opacity:1;max-height:120px}
+.mini div{flex:1;background:var(--bg);border-radius:10px;padding:8px;font-size:12px;font-weight:600;text-align:center}
+.mini i{display:block;height:6px;border-radius:4px;background:var(--acc);margin-top:6px;opacity:.7}
+.cta{text-align:center;margin-top:22px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.how div{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}.how b{color:var(--acc);font-size:26px}
+footer{text-align:center;color:var(--mut);padding:40px 0}
+/* app */
+#app{display:none}.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:18px 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}.stat span{color:var(--mut);font-size:13px}.stat b{display:block;font-size:30px}
+.stat.due b{color:var(--warn)}
+.fu{margin:20px 0;background:linear-gradient(135deg,#f59e0b18,#ef444412);border:1px solid #f59e0b66;border-radius:18px;padding:18px}
+.fu h3{margin:0 0 10px}.fr{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
+.fr small{color:var(--mut);display:block}.ok{color:var(--acc2);font-weight:600}
+.board{display:grid;grid-template-columns:repeat(5,minmax(230px,1fr));gap:14px;overflow-x:auto;padding-bottom:14px}
+.col{background:color-mix(in srgb,var(--card) 60%,transparent);border:1px solid var(--line);border-radius:16px;padding:12px;min-height:220px}
+.col.over{outline:2px dashed var(--acc)}.col h4{margin:0 0 10px;display:flex;justify-content:space-between}.col h4 em{font-style:normal;background:var(--line);border-radius:10px;padding:0 9px;font-size:13px}
+.app{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:grab;font-size:14px;animation:up .4s}
+.app b{font-size:15px}.app .m{color:var(--mut);font-size:12px}.app.late{border-left:4px solid var(--warn)}
+.app select{width:100%;margin-top:8px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px;font-size:12px}
+.app .x{float:right;border:0;background:none;color:var(--mut);cursor:pointer}.tag{display:inline-block;font-size:11px;background:#5b5bf022;color:var(--acc);border-radius:6px;padding:1px 7px;margin-top:4px}
+.tag.w{background:#f59e0b26;color:var(--warn)}
+.modal{position:fixed;inset:0;background:#0009;display:none;place-items:center;padding:16px;z-index:10}.modal.on{display:grid}
+form{background:var(--card);border-radius:20px;padding:24px;width:min(560px,100%);max-height:92%;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+form h3{grid-column:1/-1;margin:0}label{font-size:13px;color:var(--mut);display:grid;gap:4px}.full{grid-column:1/-1}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--acc2);color:#04221c;font-weight:700;padding:12px 22px;border-radius:12px;transition:.4s;z-index:20}.toast.on{transform:translate(-50%,0)}
+@media(max-width:700px){.chips{grid-template-columns:1fr}.link{width:20px}form{grid-template-columns:1fr}}
+</style></head><body>
+<div id="landing"><div class="wrap">
+<nav><div class="logo">Job<b>Flow</b></div><button class="btn sec" onclick="openApp()">Try Live Demo</button></nav>
+<div class="hero">
+<div class="fade" style="animation-delay:.1s">✨ Smart Job Application Tracker</div>
+<h1 class="fade" style="animation-delay:.25s"><span class="grad">JobFlow</span><br>Turn your job search into a clear workflow.</h1>
+<p class="fade" style="animation-delay:.4s">Track applications, organize interviews, follow up on time, and understand your entire job-search pipeline in one place.</p>
+<div class="fade" style="animation-delay:.55s"><button class="btn pri" onclick="openApp()">Try Live Demo</button> <button class="btn sec" onclick="document.getElementById('how').scrollIntoView()">See How It Works</button></div>
+<div class="flow fade" style="animation-delay:.8s">
+<div class="node" style="--i:0">📨 Applied<small>Day 0</small></div><div class="link" style="--i:0"></div>
+<div class="node" style="--i:1">🔍 Under Review<small>Day 3–7</small></div><div class="link" style="--i:1"></div>
+<div class="node" style="--i:2">🎤 Interview<small>Day 10+</small></div><div class="link" style="--i:2"></div>
+<div class="node" style="--i:3">🎉 Offer<small>Goal</small></div></div></div>
+
+<section class="blk"><h2 id="pt">The Problem</h2><div class="sub" id="ps">Job hunting gets messy fast.</div>
+<div class="stage" id="stage"><div class="chips">
+<div class="chip" style="--r:-4deg;--x:-6px;--y:10px"><div class="e">📌</div><div class="t p">Applications scattered across different platforms</div><div class="t">One searchable pipeline</div><div class="s">✓ Every application lives in one dashboard</div></div>
+<div class="chip" style="--r:3deg;--x:8px;--y:-14px"><div class="e">⏰</div><div class="t p">Missed follow-ups and interview dates</div><div class="t">Smart follow-up alerts</div><div class="s">✓ Stale applications flagged after 7 days</div></div>
+<div class="chip" style="--r:-2deg;--x:4px;--y:16px"><div class="e">📊</div><div class="t p">No clear view of application progress</div><div class="t">Live progress view</div><div class="s">✓ Drag cards through your funnel</div></div></div>
+<div class="mini"><div>Applied<i style="width:70%"></i></div><div>Review<i style="width:90%"></i></div><div>Interview<i style="width:45%"></i></div><div>Offer<i style="width:20%"></i></div></div></div>
+<div class="cta"><button class="btn pri" id="tog" onclick="solve()">Organize it with JobFlow →</button></div></section>
+
+<section class="blk" id="how"><h2>How It Works</h2><div class="sub">Three steps to a calmer job search.</div>
+<div class="how"><div><b>1</b><h3>Add</h3>Log a role in seconds with links, dates and notes.</div><div><b>2</b><h3>Move</h3>Drag applications across the pipeline as things progress.</div><div><b>3</b><h3>Follow up</h3>JobFlow flags anything waiting over 7 days.</div></div>
+<div class="cta"><button class="btn pri" onclick="openApp()">Try Live Demo</button></div></section>
+<footer>JobFlow — built as a frontend demo · data stays in your browser</footer></div></div>
+
+<div id="app"><div class="wrap">
+<div class="top"><div class="logo" style="cursor:pointer" onclick="closeApp()">Job<b>Flow</b> <small style="font-weight:500;color:var(--mut)">Dashboard</small></div>
+<div><button class="btn sec" onclick="resetDemo()">Reset demo</button> <button class="btn sec" onclick="closeApp()">← Home</button> <button class="btn pri" onclick="modal(1)">+ Add Application</button></div></div>
+<div class="stats" id="stats"></div><div id="fu"></div>
+<h3>Application Pipeline <small style="color:var(--mut);font-weight:400">— drag cards or use the dropdown</small></h3>
+<div class="board" id="board"></div></div></div>
+
+<div class="modal" id="mod"><form id="f" autocomplete="off"><h3>Add Application</h3>
+<label>Company<input name="company" required></label><label>Job Role<input name="role" required></label>
+<label>Location<input name="loc"></label><label>Application Date<input type="date" name="date" required></label>
+<label>Status<select name="status"></select></label><label>Interview Date<input type="date" name="int"></label>
+<label class="full">Job URL<input type="url" name="url" placeholder="https://"></label>
+<label class="full">Notes<textarea name="notes" rows="3"></textarea></label>
+<div class="full" style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="btn sec" onclick="modal(0)">Cancel</button><button class="btn pri">Add Application</button></div></form></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const S=['Applied','Under Review','Interview','Offer','Rejected'],KEY='jobflow.v1',$=id=>document.getElementById(id);
+const iso=n=>{const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().slice(0,10)};
+const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function seed(){
+const r=[['Google','Frontend Engineer','Bengaluru',0,9],['Razorpay','UI Engineer','Bengaluru',0,1],['Swiggy','React Developer','Remote',0,2],['Zomato','Web Developer','Gurugram',0,3],['Atlassian','Software Engineer','Remote',0,4],['Flipkart','SDE II','Bengaluru',0,5],['Zoho','Full Stack Dev','Chennai',0,6],
+['Microsoft','SWE','Hyderabad',1,12],['Amazon','SDE I','Pune',1,8],['Adobe','Frontend Dev','Noida',1,3],['Uber','Web Engineer','Remote',1,4],['Cred','UI Engineer','Bengaluru',1,5],['PhonePe','Frontend Eng','Pune',1,6],['Freshworks','React Dev','Chennai',1,5],['Paytm','Web Dev','Noida',1,6],
+['Stripe','Frontend Eng','Remote',2,14],['Shopify','Front-end Dev','Remote',2,11],['Meesho','SDE II','Bengaluru',2,9],['Postman','UI Engineer','Bengaluru',2,10],
+['Notion','Product Engineer','Remote',3,20],['Netflix','UI Engineer','Remote',3,18],
+['Oracle','Developer','Pune',4,15],['Infosys','Sr. Engineer','Pune',4,13],['Meta','Frontend Eng','Remote',4,16]];
+return r.map((a,i)=>({id:'s'+i,company:a[0],role:a[1],loc:a[2],status:S[a[3]],date:iso(a[4]),fu:'',int:a[3]==2?iso(-(i%5+2)):'',url:'',notes:''}))}
+let apps;try{apps=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!Array.isArray(apps))apps=seed();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(apps))}catch(e){}};
+const waiting=a=>Math.floor((new Date(iso(0))-new Date(a.fu||a.date))/864e5);
+const due=a=>(a.status=='Applied'||a.status=='Under Review')&&waiting(a)>7;
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2600)}
+function render(){
+const c=s=>apps.filter(a=>a.status==s).length,d=apps.filter(due);
+$('stats').innerHTML=[['Total Applications',apps.length],['Under Review',c('Under Review')],['Interviews',c('Interview')],['Follow-ups Due',d.length,'due'],['Offers',c('Offer')]].map(x=>`<div class="stat ${x[2]||''}"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('');
+$('fu').innerHTML=d.length?`<div class="fu"><h3>⚠️ Follow-ups needed (${d.length})</h3>${d.sort((a,b)=>waiting(b)-waiting(a)).map(a=>`<div class="fr"><div><b>${esc(a.company)}</b> — ${esc(a.role)}<small>Waiting ${waiting(a)} days · ${a.status}</small></div><div><button class="btn sec" onclick="draft('${a.id}')">Copy email</button> <button class="btn pri" onclick="followed('${a.id}')">Mark followed up</button></div></div>`).join('')}</div>`:`<div class="fu"><span class="ok">✓ You're all caught up — no follow-ups needed.</span></div>`;
+$('board').innerHTML=S.map(s=>`<div class="col" data-s="${s}"><h4>${s}<em>${c(s)}</em></h4>${apps.filter(a=>a.status==s).map(card).join('')}</div>`).join('');
+document.querySelectorAll('.app').forEach(e=>e.ondragstart=ev=>ev.dataTransfer.setData('text',e.dataset.id));
+document.querySelectorAll('.col').forEach(e=>{e.ondragover=ev=>{ev.preventDefault();e.classList.add('over')};e.ondragleave=()=>e.classList.remove('over');e.ondrop=ev=>{ev.preventDefault();move(ev.dataTransfer.getData('text'),e.dataset.s)}})}
+function card(a){const u=/^https?:\/\//.test(a.url)?`<a href="${esc(a.url)}" target="_blank" rel="noopener" style="color:var(--acc)">Job link ↗</a>`:'';
+return `<div class="app ${due(a)?'late':''}" draggable="true" data-id="${a.id}"><button class="x" onclick="del('${a.id}')" title="Delete">×</button><b>${esc(a.company)}</b><div>${esc(a.role)}</div><div class="m">${esc(a.loc)} · Applied ${a.date}</div>${a.int?`<span class="tag">🎤 ${a.int}</span> `:''}${due(a)?`<span class="tag w">⏰ ${waiting(a)}d waiting</span>`:''}${a.notes?`<div class="m">📝 ${esc(a.notes)}</div>`:''}<div class="m">${u}</div><select onchange="move('${a.id}',this.value)">${S.map(s=>`<option ${s==a.status?'selected':''}>${s}</option>`).join('')}</select></div>`}
+function move(id,s){const a=apps.find(x=>x.id==id);if(a&&a.status!=s){a.status=s;if(s=='Interview'&&!a.int)a.int='';save();toast(`${a.company} moved to ${s}`)}render()}
+function del(id){apps=apps.filter(a=>a.id!=id);save();render()}
+function followed(id){const a=apps.find(x=>x.id==id);a.fu=iso(0);save();render();toast('Follow-up logged for '+a.company)}
+function draft(id){const a=apps.find(x=>x.id==id);const t=`Subject: Following up — ${a.role}\n\nHi ${a.company} team,\n\nI applied for the ${a.role} role ${waiting(a)} days ago and wanted to check in on the status. I'm still very excited about the opportunity.\n\nThank you!`;try{navigator.clipboard.writeText(t);toast('Follow-up email copied')}catch(e){toast('Copy unavailable')}}
+function modal(o){$('mod').classList.toggle('on',!!o);if(o){$('f').reset();$('f').date.value=iso(0)}}
+$('f').status.innerHTML=S.map(s=>`<option>${s}</option>`).join('');
+$('f').onsubmit=e=>{e.preventDefault();const f=e.target;apps.unshift({id:'u'+Date.now(),company:f.company.value.trim(),role:f.role.value.trim(),loc:f.loc.value.trim(),status:f.status.value,date:f.date.value,fu:'',int:f.int.value,url:f.url.value.trim(),notes:f.notes.value.trim()});save();modal(0);render();toast('Application added successfully.')};
+$('mod').onclick=e=>{if(e.target.id=='mod')modal(0)};
+function openApp(){$('landing').style.display='none';$('app').style.display='block';scrollTo(0,0);render()}
+function closeApp(){$('app').style.display='none';$('landing').style.display='block';scrollTo(0,0)}
+function resetDemo(){apps=seed();save();render();toast('Demo data restored')}
+function solve(){const s=$('stage'),on=s.classList.toggle('solved');$('pt').textContent=on?'The Solution':'The Problem';$('ps').textContent=on?'JobFlow organizes everything into one dashboard.':'Job hunting gets messy fast.';$('tog').textContent=on?'↺ Replay the problem':'Organize it with JobFlow →'}
+new IntersectionObserver((e,o)=>{if(e[0].isIntersecting){setTimeout(()=>{if(!$('stage').classList.contains('solved'))solve()},3200);o.disconnect()}},{threshold:.6}).observe($('stage'));
+</script></body></html>
